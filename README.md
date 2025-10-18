@@ -1,28 +1,28 @@
-# Infraestrutura como Código — Usuários, Grupos, Diretórios e Permissões
+# Infraestrutura como Código — Gusbaido (Linux/WSL)
 
-Script Bash para preparar um ambiente Linux/WSL de forma automática, criando grupos, usuários, diretórios e permissões, com boas práticas de segurança (setgid/sticky opcional) e relatório final.
+Script Bash criado por **Gusbaido** para preparar automaticamente um ambiente Linux/WSL, com criação de grupos, usuários, diretórios e permissões, aplicando boas práticas de segurança e versionado em: [https://github.com/Gusbaido/LinuxGit](https://github.com/Gusbaido/LinuxGit)
 
 ## 📦 O que este script faz
 
-* Cria os grupos: **ti**, **vendas**, **rh**
-* Cria os diretórios: **/departamentos/{ti,vendas,rh}** (perm. 770) e **/departamentos/compartilhado** (perm. 777)
+* Cria grupos: **ti**, **vendas**, **rh**
+* Cria diretórios: **/departamentos/{ti,vendas,rh}** (perm. 770) e **/departamentos/compartilhado** (perm. 777)
 * Cria usuários padrão: **ti01**, **ti02**, **vendas01**, **vendas02**, **rh01**, **rh02**
 * (Opcional) Cria **mariana** e adiciona aos grupos **sudo** e **adm**
 * Define senha inicial (**Senha123**) e força troca no 1º login (`chage -d 0`)
 * Mostra relatório final com grupos, membros e permissões
 
-> **Dica**: após rodar, você pode aplicar **setgid** nas pastas de times e **sticky bit** no compartilhado:
+> **Dica:** após rodar, aplique boas práticas de segurança:
 >
 > ```bash
-> sudo chmod 2770 /departamentos/{ti,vendas,rh}
-> sudo chmod 1777 /departamentos/compartilhado
+> sudo chmod 2770 /departamentos/{ti,vendas,rh}   # setgid → herda grupo automaticamente
+> sudo chmod 1777 /departamentos/compartilhado    # sticky bit → impede deleção cruzada
 > ```
 
 ## ✅ Requisitos
 
 * Linux (Ubuntu/Debian/WSL) com `bash`, `sudo` e pacotes básicos
-* Usuário com permissão para executar `sudo`
-* `git` instalado para versionar (opcional)
+* Usuário com permissão de `sudo`
+* `git` instalado para versionar
 
 ## 🚀 Como usar
 
@@ -31,7 +31,7 @@ Script Bash para preparar um ambiente Linux/WSL de forma automática, criando gr
    ```bash
    chmod +x infra_users_dirs.sh
    ```
-2. Rode como root/sudo:
+2. Execute com privilégios:
 
    ```bash
    sudo ./infra_users_dirs.sh
@@ -46,17 +46,17 @@ Script Bash para preparar um ambiente Linux/WSL de forma automática, criando gr
 ## ⚙️ Variáveis principais (edite no topo do script)
 
 * `BASE_DIR` → diretório base (padrão `/departamentos`)
-* `GROUPS` → lista de grupos (padrão `ti vendas rh`)
+* `GROUPS` → grupos (`ti vendas rh`)
 * `DIRS` → mapa grupo → diretório
-* `DEFAULT_PASSWORD` → senha inicial (padrão `Senha123`)
-* `ADMIN_LOGIN`, `ADMIN_GROUPS` → admin opcional (padrão `mariana`, grupos `sudo adm`)
+* `DEFAULT_PASSWORD` → senha inicial (`Senha123`)
+* `ADMIN_LOGIN`, `ADMIN_GROUPS` → admin opcional (`mariana`, grupos `sudo adm`)
 
-## 🔒 Segurança e boas práticas
+## 🔒 Segurança e Boas Práticas
 
-* `set -euo pipefail` para fail-fast e variáveis obrigatórias
-* **Senha inicial** é provisória; o script força troca no primeiro login
-* Use **setgid** nas pastas de times para herdar grupo automaticamente
-* Use **sticky bit** em `/departamentos/compartilhado` para impedir deleção cruzada
+* `set -euo pipefail` para execução segura
+* `chage -d 0` força redefinição da senha no primeiro login
+* `setgid` mantém grupo consistente dentro das pastas
+* `sticky bit` protege arquivos no diretório compartilhado
 
 ## 🧪 Testes rápidos
 
@@ -67,20 +67,17 @@ cd /departamentos/ti && touch teste.txt && ls -l
 cd /departamentos/vendas  # deve dar “Permissão negada”
 ```
 
-## 🛠️ Troubleshooting
-
-* `unbound variable` → confira `GROUPS=(ti vendas rh)` (sem vírgulas) e as chaves de `DIRS`
-* `Operation not permitted` ao usar `chmod` em `/departamentos` → rode como **root**
-* WSL: prefira criar o projeto em `~/LinuxGit` (filesystem do Linux) para manter permissões POSIX
-
-## 🧭 Versionamento (atalho)
+## 🧭 Versionamento
 
 ```bash
 git init
-git add infra_users_dirs.sh
-git commit -m "Infraestrutura como Código: usuários, grupos e permissões"
+git add infra_users_dirs.sh README.md
+git commit -m "Infraestrutura como Código - criação de grupos, usuários e diretórios"
+git branch -M main
+git remote add origin https://github.com/Gusbaido/LinuxGit.git
+git push -u origin main
 ```
 
-Crie um repo no GitHub e faça `git remote add origin <URL>` e `git push -u origin main` (veja guia completo no passo a passo do chat).
+## 📄 Licença
 
-## By GUS
+MIT © 2025 [Gusbaido](https://github.com/Gusbaido)
